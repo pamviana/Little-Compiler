@@ -1,0 +1,41 @@
+PROGRAM kinematic
+BEGIN
+		
+		INT vi,F, one;
+		FLOAT half, vf, x, m, W, d;
+		STRING force := "Force = ";
+		STRING work := "Work = ";
+		
+		FUNCTION VOID main()
+		BEGIN
+			vi := 0;		
+			one := 1;
+			half := 0.0;
+			vf := 0.0;
+			
+			READ(vf);
+			READ(x);
+			READ(m);
+			
+			half := 0.5;
+			
+			vf := vf * vf;
+			vi := vi * vi;
+			vf := vf * m;
+			vf := vf * half;
+			vi := vi * vi;
+			vi := vi * m;
+			vi := vi * half;
+			x := vf - vi;
+			F := one / x;
+			
+			WRITE(force, F);
+			
+			READ(d);
+			
+			W := F * d;
+			
+			WRITE(work, W);
+	END	
+END
+		

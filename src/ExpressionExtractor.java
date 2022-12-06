@@ -14,7 +14,7 @@ public class ExpressionExtractor extends LittleBaseListener {
 	@Override
 	public void exitProgram(LittleParser.ProgramContext ctx) {
 		
-		HashMap<Integer, String> registers = new HashMap<Integer,String>();
+		HashMap<String, RegisterInfo> registers = new HashMap<String,RegisterInfo>();
 		
 		printVariables();
 		
@@ -23,41 +23,63 @@ public class ExpressionExtractor extends LittleBaseListener {
 			char type = nodeType.getLabel();
 			
 			if(node.instruction.equals(NodeInstruction.write)) {
-				System.out.println("sys " + "write" + type + " " + node.id);
+				System.out.print("sys " + "write" + type);
+				if(!symbolTables.get(node.id).type.equals(ValTypes.STRING)) {
+					System.out.println(" r" + registers.get(node.id).register);
+				} else {
+					System.out.println(" " + node.id);
+				}				
 			}
 			
 			else if(node.instruction.equals(NodeInstruction.read)) {
-				System.out.println("sys " + "read" + type + " " + node.id);
+				int newReg = registerCount++;
+				RegisterInfo newId = new RegisterInfo(newReg, null);
+				registers.put(node.id, newId);
+				System.out.println("sys " + "read" + type + " " + "r"+ newReg);
 			}
 			
 			else if(node.instruction.equals(NodeInstruction.store)) {
 				
-				int register = registerCount;				
+				int register = registerCount++;				
+				RegisterInfo newId = new RegisterInfo(register, node.left);
 				Symbol symbol = symbolTables.get(node.id);
-				symbol.setRegister(register);
-				symbol.setValue(node.left);
+				//symbol.setRegister(register);
+				//symbol.setValue(node.left);
 				
-				registers.put(register, node.left);
+				registers.put(node.id, newId);
 											
 				System.out.println("move " + node.left + " " + "r" + register);
-				System.out.println("move " + "r" + register + " " + node.id);
-				
-				registerCount++;
 			}
 			else {
-				int idRegister = symbolTables.get(node.id).register;
-				int leftRegister = -2;
-				int rightRegister = -2;
+				if(!registers.containsKey(node.id)) {
+					int register = registerCount++;				
+					RegisterInfo newId = new RegisterInfo(register, null);
+					registers.put(node.id, newId);
+				}
+				if(!registers.containsKey(node.left)) {
+					int register = registerCount++;				
+					RegisterInfo newId = new RegisterInfo(register, null);
+					registers.put(node.left, newId);
+				}
+				if(!registers.containsKey(node.right)) {
+					int register = registerCount++;				
+					RegisterInfo newId = new RegisterInfo(register, null);
+					registers.put(node.left, newId);
+				}
 				
-				if(symbolTables.containsKey(node.left)) {
+				int idRegister = registers.get(node.id).register;
+				int leftRegister = registers.get(node.left).register;
+				int rightRegister = registers.get(node.right).register;
+				
+				/*if(symbolTables.containsKey(node.left)) {
 					leftRegister = symbolTables.get(node.left).register;
 				}
 				
 				if(symbolTables.containsKey(node.right)) {
 					rightRegister = symbolTables.get(node.right).register;
-				}			
+				}		*/	
 				
-				if(rightRegister == -2 && registers.containsValue(node.right)) {
+				/*if(rightRegister == -2 && registers.containsValue(node.right)) {
 					for (Entry<Integer, String> register : registers.entrySet()) {
 				        if (Objects.equals(register.getValue(), node.right)) {
 				            rightRegister = register.getKey();
@@ -73,9 +95,9 @@ public class ExpressionExtractor extends LittleBaseListener {
 				            break;
 				        }
 				    }
-				}								
+				}			*/					
 				
-				if(leftRegister == -1) {
+				/*if(leftRegister == -1) {
 					leftRegister = registerCount++;
 					System.out.println("move " + node.left + " " + "r" + leftRegister);
 				}
@@ -83,14 +105,14 @@ public class ExpressionExtractor extends LittleBaseListener {
 				if(idRegister != leftRegister) {
 					symbolTables.get(node.id).setRegister(leftRegister);
 					symbolTables.get(node.left).setRegister(-1);
-				}				
+				}	*/			
 				
 				String leftExp = "r" + leftRegister;
 				String rightExp = "r" + rightRegister;
 				
-				if(rightRegister == -1) {
+				/*if(rightRegister == -1) {
 					rightExp = node.right;
-				}		
+				}		*/
 				
 				if(node.instruction.equals(NodeInstruction.add)) {
 					System.out.println("add" + type + " " + rightExp + " " + leftExp);
@@ -105,21 +127,20 @@ public class ExpressionExtractor extends LittleBaseListener {
 					System.out.println("mul" + type + " " + rightExp + " " + leftExp);
 				}
 				
-				int index = instructions.indexOf(node);
-				boolean showMove = false;
+				
+				registers.get(node.left).setRegister(-1);
+				registers.get(node.id).setRegister(leftRegister);
+				
+				/*int index = instructions.indexOf(node);
 				for(int i = index+1; i < instructions.size() ; i++) {
 					if(instructions.get(i).id.equals(node.id) && !instructions.get(i).instruction.equals(NodeInstruction.write)) {
-						break;
+						
 					}
 					
 					if(instructions.get(i).id.equals(node.id) && instructions.get(i).instruction.equals(NodeInstruction.write)) {
-						showMove = true;
+						
 					}
-				}
-				
-				if(showMove) {
-					System.out.println("move " + leftExp + " " + node.id);
-				}
+				}*/
 				
 			}
 		}		
@@ -218,9 +239,9 @@ public class ExpressionExtractor extends LittleBaseListener {
 	
 	private void printVariables() {
 		for(Map.Entry<String, Symbol> currMap : symbolTables.entrySet()) {					
-			if(currMap.getValue().type.equals(ValTypes.INT) || currMap.getValue().type.equals(ValTypes.FLOAT)) {
+			/*if(currMap.getValue().type.equals(ValTypes.INT) || currMap.getValue().type.equals(ValTypes.FLOAT)) {
 				System.out.println("var " + currMap.getValue().name);
-			}
+			}*/
 			
 			if(currMap.getValue().type.equals(ValTypes.STRING)) {
 				System.out.println("str " + currMap.getValue().name + " " + currMap.getValue().value);

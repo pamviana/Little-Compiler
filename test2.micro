@@ -9,7 +9,7 @@ BEGIN
 		b := 30;
 		c := 40;
 
-		c := a - b;
+		c := a-b;
 		b := b*b;
 		b := b + a;
 		d := (b*a);

@@ -1,0 +1,11 @@
+PROGRAM expr
+BEGIN
+	
+	FLOAT c,d,a;
+	STRING newline := "\n";
+
+	FUNCTION VOID main()
+	BEGIN
+		c := (d) * a;
+	END	
+END

@@ -9,22 +9,14 @@ import java.util.Objects;
 public class ExpressionExtractor extends LittleBaseListener {
 	private LinkedHashMap<String, Symbol> symbolTables = new LinkedHashMap<String, Symbol>();
 	private ArrayList<IRNode> instructions = new ArrayList<IRNode>();
-	private int registerCount = 0;	
+	private int registerCount = 0;		
 		
 	@Override
 	public void exitProgram(LittleParser.ProgramContext ctx) {
 		
 		HashMap<Integer, String> registers = new HashMap<Integer,String>();
 		
-		for(Map.Entry<String, Symbol> currMap : symbolTables.entrySet()) {					
-			if(currMap.getValue().type.equals(ValTypes.INT) || currMap.getValue().type.equals(ValTypes.FLOAT)) {
-				System.out.println("var " + currMap.getValue().name);
-			}
-			
-			if(currMap.getValue().type.equals(ValTypes.STRING)) {
-				System.out.println("str " + currMap.getValue().name + " " + currMap.getValue().value);
-			}				
-		}
+		printVariables();
 		
 		for(IRNode node : instructions) {
 			ValTypes nodeType = symbolTables.get(node.id).type;
@@ -113,19 +105,6 @@ public class ExpressionExtractor extends LittleBaseListener {
 					System.out.println("mul" + type + " " + rightExp + " " + leftExp);
 				}
 				
-				/*if(idRegister == -1) {
-					idRegister = registerCount;
-					symbolTables.get(node.id).setRegister(idRegister);
-					registerCount++;
-					System.out.println("move " + node.left + " " + "r" + idRegister);	
-				}*/
-				/*if(!symbolTables.containsKey(node.right)) {
-					int newRegister = registerCount;
-					System.out.println("move " + node.right + " " + "r" + registerCount);	
-					node.right = "r" + registerCount;
-					registerCount++;
-				}
-				*/
 				int index = instructions.indexOf(node);
 				boolean showMove = false;
 				for(int i = index+1; i < instructions.size() ; i++) {
@@ -234,6 +213,18 @@ public class ExpressionExtractor extends LittleBaseListener {
 		for(int i=0; i< ids.length;i++) {
 			ValTypes type = symbolTables.get(ids[i]).type;
 			instructions.add(new IRNode(NodeInstruction.write, type, ids[i], null, null));
+		}
+	}
+	
+	private void printVariables() {
+		for(Map.Entry<String, Symbol> currMap : symbolTables.entrySet()) {					
+			if(currMap.getValue().type.equals(ValTypes.INT) || currMap.getValue().type.equals(ValTypes.FLOAT)) {
+				System.out.println("var " + currMap.getValue().name);
+			}
+			
+			if(currMap.getValue().type.equals(ValTypes.STRING)) {
+				System.out.println("str " + currMap.getValue().name + " " + currMap.getValue().value);
+			}				
 		}
 	}
 	

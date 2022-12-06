@@ -103,13 +103,8 @@ public class ExpressionExtractor extends LittleBaseListener {
 					registers.get(node.id).setRegister(idRegister);
 				}
 				
-				String leftExp = "r" + leftRegister;
 				String rightExp = "r" + rightRegister;
 				String idExp = "r" + idRegister;
-				
-				/*if(rightRegister == -1) {
-					rightExp = node.right;
-				}		*/
 				
 				if(node.instruction.equals(NodeInstruction.add)) {
 					System.out.println("add" + type + " " + rightExp + " " + idExp);
@@ -122,14 +117,7 @@ public class ExpressionExtractor extends LittleBaseListener {
 				}
 				else if(node.instruction.equals(NodeInstruction.mul)) {
 					System.out.println("mul" + type + " " + rightExp + " " + idExp);
-				}
-				
-				
-				/*registers.get(node.left).setRegister(-1);
-				registers.get(node.id).setRegister(leftRegister);*/
-				
-				
-				
+				}				
 			}
 		}		
 		
@@ -227,17 +215,10 @@ public class ExpressionExtractor extends LittleBaseListener {
 	
 	private void printVariables() {
 		for(Map.Entry<String, Symbol> currMap : symbolTables.entrySet()) {					
-			/*if(currMap.getValue().type.equals(ValTypes.INT) || currMap.getValue().type.equals(ValTypes.FLOAT)) {
-				System.out.println("var " + currMap.getValue().name);
-			}*/
-			
 			if(currMap.getValue().type.equals(ValTypes.STRING)) {
 				System.out.println("str " + currMap.getValue().name + " " + currMap.getValue().value);
 			}				
 		}
 	}
 	
-	private void printTinyCode() {
-		
-	}
 }

@@ -25,7 +25,7 @@ public class ExpressionExtractor extends LittleBaseListener {
 			if(node.instruction.equals(NodeInstruction.write)) {
 				System.out.print("sys " + "write" + type);
 				if(!symbolTables.get(node.id).type.equals(ValTypes.STRING)) {
-					System.out.println(" r" + registers.get(node.id).register);
+					System.out.println(" r" + symbolTables.get(node.id).register);
 				} else {
 					System.out.println(" " + node.id);
 				}				
@@ -35,6 +35,7 @@ public class ExpressionExtractor extends LittleBaseListener {
 				int newReg = registerCount++;
 				RegisterInfo newId = new RegisterInfo(newReg, null);
 				registers.put(node.id, newId);
+				symbolTables.get(node.id).setRegister(newReg);
 				System.out.println("sys " + "read" + type + " " + "r"+ newReg);
 			}
 			
@@ -43,8 +44,8 @@ public class ExpressionExtractor extends LittleBaseListener {
 				int register = registerCount++;				
 				RegisterInfo newId = new RegisterInfo(register, node.left);
 				Symbol symbol = symbolTables.get(node.id);
-				//symbol.setRegister(register);
-				//symbol.setValue(node.left);
+				symbol.setRegister(register);
+				symbol.setValue(node.left);
 				
 				registers.put(node.id, newId);
 											
@@ -66,81 +67,69 @@ public class ExpressionExtractor extends LittleBaseListener {
 					RegisterInfo newId = new RegisterInfo(register, null);
 					registers.put(node.left, newId);
 				}
-				
+								
 				int idRegister = registers.get(node.id).register;
 				int leftRegister = registers.get(node.left).register;
 				int rightRegister = registers.get(node.right).register;
 				
-				/*if(symbolTables.containsKey(node.left)) {
-					leftRegister = symbolTables.get(node.left).register;
+				if(symbolTables.containsKey(node.id)) {
+					symbolTables.get(node.id).setRegister(idRegister);
 				}
+												
+				boolean isLeftUsedFurther = false;				
+								
+				if(!node.id.equals(node.left)) {
+					int index = instructions.indexOf(node);
+					for(int i = index+1; i < instructions.size() ; i++) {
+						if(instructions.get(i).left != null && instructions.get(i).right != null) {
+							if(instructions.get(i).left.equals(node.left) || instructions.get(i).right.equals(node.left)) {
+								System.out.println("move " + "r" + leftRegister + " r" + idRegister);
+								isLeftUsedFurther = true;
+								break;
+							}
+						}
+						
+						if(instructions.get(i).id.equals(node.left) && instructions.get(i).instruction.equals(NodeInstruction.write)) {
+							System.out.println("move " + "r" + leftRegister + " r" + idRegister);
+							isLeftUsedFurther = true;
+							break;
+						}
+					}
+				}	
 				
-				if(symbolTables.containsKey(node.right)) {
-					rightRegister = symbolTables.get(node.right).register;
-				}		*/	
 				
-				/*if(rightRegister == -2 && registers.containsValue(node.right)) {
-					for (Entry<Integer, String> register : registers.entrySet()) {
-				        if (Objects.equals(register.getValue(), node.right)) {
-				            rightRegister = register.getKey();
-				            break;
-				        }
-				    }
+				if(node.id.equals(node.right) || !isLeftUsedFurther) {
+					idRegister = leftRegister;
+					symbolTables.get(node.id).setRegister(idRegister);
+					registers.get(node.id).setRegister(idRegister);
 				}
-				
-				if(leftRegister == -2 && registers.containsValue(node.left)) {
-					for (Entry<Integer, String> register : registers.entrySet()) {
-				        if (Objects.equals(register.getValue(), node.left)) {
-				        	leftRegister = register.getKey();
-				            break;
-				        }
-				    }
-				}			*/					
-				
-				/*if(leftRegister == -1) {
-					leftRegister = registerCount++;
-					System.out.println("move " + node.left + " " + "r" + leftRegister);
-				}
-				
-				if(idRegister != leftRegister) {
-					symbolTables.get(node.id).setRegister(leftRegister);
-					symbolTables.get(node.left).setRegister(-1);
-				}	*/			
 				
 				String leftExp = "r" + leftRegister;
 				String rightExp = "r" + rightRegister;
+				String idExp = "r" + idRegister;
 				
 				/*if(rightRegister == -1) {
 					rightExp = node.right;
 				}		*/
 				
 				if(node.instruction.equals(NodeInstruction.add)) {
-					System.out.println("add" + type + " " + rightExp + " " + leftExp);
+					System.out.println("add" + type + " " + rightExp + " " + idExp);
 				}
 				else if(node.instruction.equals(NodeInstruction.sub)) {
-					System.out.println("sub" + type + " " + rightExp + " " + leftExp);
+					System.out.println("sub" + type + " " + rightExp + " " + idExp);
 				}
 				else if(node.instruction.equals(NodeInstruction.div)) {
-					System.out.println("div" + type + " " + rightExp + " " + leftExp);
+					System.out.println("div" + type + " " + rightExp + " " + idExp);
 				}
 				else if(node.instruction.equals(NodeInstruction.mul)) {
-					System.out.println("mul" + type + " " + rightExp + " " + leftExp);
+					System.out.println("mul" + type + " " + rightExp + " " + idExp);
 				}
 				
 				
-				registers.get(node.left).setRegister(-1);
-				registers.get(node.id).setRegister(leftRegister);
+				/*registers.get(node.left).setRegister(-1);
+				registers.get(node.id).setRegister(leftRegister);*/
 				
-				/*int index = instructions.indexOf(node);
-				for(int i = index+1; i < instructions.size() ; i++) {
-					if(instructions.get(i).id.equals(node.id) && !instructions.get(i).instruction.equals(NodeInstruction.write)) {
-						
-					}
-					
-					if(instructions.get(i).id.equals(node.id) && instructions.get(i).instruction.equals(NodeInstruction.write)) {
-						
-					}
-				}*/
+				
 				
 			}
 		}		

@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Driver {
 	public static void main(String[] args) throws IOException {
-		CharStream inputStream = CharStreams.fromFileName("test2.micro");
+		CharStream inputStream = CharStreams.fromFileName("test1.micro");
 		
 		LittleLexer lexer = new LittleLexer(inputStream);	    
 		CommonTokenStream tokens = new CommonTokenStream(lexer);

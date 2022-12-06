@@ -1,10 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
 
 public class ExpressionExtractor extends LittleBaseListener {
 	private LinkedHashMap<String, Symbol> symbolTables = new LinkedHashMap<String, Symbol>();
@@ -61,11 +58,13 @@ public class ExpressionExtractor extends LittleBaseListener {
 					int register = registerCount++;				
 					RegisterInfo newId = new RegisterInfo(register, null);
 					registers.put(node.left, newId);
+					System.out.println("move " + node.left + " r" + register);
 				}
 				if(!registers.containsKey(node.right)) {
 					int register = registerCount++;				
 					RegisterInfo newId = new RegisterInfo(register, null);
-					registers.put(node.left, newId);
+					registers.put(node.right, newId);
+					System.out.println("move " + node.right + " r" + register);
 				}
 								
 				int idRegister = registers.get(node.id).register;
